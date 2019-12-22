@@ -1,8 +1,23 @@
+; ---------------------------------------------------------------- 
+; 作者: 陳泰元 110616038
+; 程式操作說明:
+;	直接執行即可，已事先寫入課本講義範例第一題(對48及35做加法與減法)
+;	會在Console中先顯示做減法、Das後的暫存器與旗標狀況，第二部分再顯示做加法、Daa後的暫存器與旗標狀況。
+;   自製Das名稱:myDAS
+;   自製Daa名稱:myDAA
+; 符合之評分標準:
+;   1.  程式有意義且可以組譯執行(+20 % )
+;   2.  完成DAS指令一樣功能的procedure(+70 % )
+;   3.  完成DAA指令一樣功能的procedure(+20 % )
+; 自評分數:
+; 90分(人非聖賢，孰能無過!)
+; ------------------------------------------------------------------
 .386
 .model flat, stdcall
 .stack 4096
 ExitProcess PROTO, dwExitCode:DWORD
 include Irvine32.inc
+
 .data
 ; Define your variables here
 .code
@@ -16,13 +31,16 @@ main PROC
 
 	mov al, 35h
 	add al, 48h
-    call myDAA
+	call myDAA
 	call DumpRegs
 
-	INVOKE ExitProcess,0
+	INVOKE ExitProcess, 0
 main ENDP
 
-
+; ----------------------------------------------------------------
+; myDAS:仿製真正的Das(Decimal adjust after subtraction)
+; 能將Packed BCD減法最後以Packed BCD表示，並改動CF、AF旗標
+; ------------------------------------------------------------------
 myDAS PROC
 	mov bl, al
 	lahf ;將EFlag暫存器低8bit送進AH(SF,ZF,Res.,AF,Res.,PF,Res.,CF)
@@ -64,6 +82,10 @@ myDAS PROC
 ret
 myDAS ENDP
 
+; ----------------------------------------------------------------
+; myDAA:仿製真正的Daa(Decimal adjust after addition)
+; 能將Packed BCD加法最後以Packed BCD表示，並改動CF、AF旗標
+; ------------------------------------------------------------------
 myDAA PROC
 	mov bl, al
 	lahf ;將EFlag暫存器低8bit送進AH(SF,ZF,Res.,AF,Res.,PF,Res.,CF)
