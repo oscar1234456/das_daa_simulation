@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.16.27030.1	    12/22/19 12:33:33
+Microsoft (R) Macro Assembler Version 14.16.27030.1	    12/22/19 15:22:45
 AddTwo.asm						     Page 1 - 1
 
 
@@ -31,8 +31,8 @@ C:/Irvine\SmallWin.inc(11) : warning A4011:multiple .MODEL directives found : .M
  00000000			.code
 
  00000000			main PROC
- 00000000  B0 48		    mov al, 48h
- 00000002  2C 35			sub al, 35h
+ 00000000  B0 32			mov al, 32h
+ 00000002  2C 39			sub al, 39h
  00000004  E8 0000000C		    call myDAS
  00000009  E8 00000000 E		call DumpRegs
 
@@ -41,42 +41,41 @@ C:/Irvine\SmallWin.inc(11) : warning A4011:multiple .MODEL directives found : .M
 
 
  00000015			myDAS PROC
-
  00000015  8A D8			mov bl, al
- 00000017  9F				lahf
+ 00000017  9F				lahf ;將EFlag暫存器低8bit送進AH(SF,ZF,Res.,AF,Res.,PF,Res.,CF)
  00000018  8A CC			mov cl, ah
- 0000001A  80 E3 0F			and bl, 00001111b
- 0000001D  80 E1 10			and cl, 00010000b
- 00000020  C0 E9 04			shr cl,4
+ 0000001A  80 E3 0F			and bl, 00001111b	;藉由bl捕捉al的低4bit
+ 0000001D  80 E1 10			and cl, 00010000b	;藉由cl得知AuxCarry的狀況
+ 00000020  C0 E9 04			shr cl,4 ;把上一步之bit推至第一位
 
-					.IF bl > 9  ||  cl == 1
+					.IF bl > 9  ||  cl == 1	;依照講義logic進行實作(al(lo)>0或AuxCarry == 1)
  0000002D  2C 06				sub al, 6
  0000002F  66| 9C				pushf
- 00000031  80 CC 10				or ah,00010000b
+ 00000031  80 CC 10				or ah,00010000b;調整AuxCarry = 1
  00000034  66| 9D				popf
- 00000036  9E					sahf
+ 00000036  9E					sahf ;將AH的8bit送至Eflag
 					.ELSE
  00000039  66| 9C				pushf
- 0000003B  80 CC 00				or ah,00000000b
+ 0000003B  80 CC 00				or ah,00000000b; 調整AuxCarry = 0
  0000003E  66| 9D				popf
- 00000040  9E					sahf
+ 00000040  9E					sahf ;將AH的8bit送至Eflag
 					.ENDIF
 
- 00000041  9F				lahf
+ 00000041  9F				lahf ; 再一次將EFlag暫存器低8bit送進AH(因為line29 sub會再一次影響)
  00000042  8A CC			mov cl, ah
  00000044  80 E1 01			and cl, 00000001b
 
-					.IF al > 9Fh || cl == 1
+					.IF al > 9Fh || cl == 1 ; 依照講義logic進行實作(al > 0或Carry == 1)
  00000050  2C 60				sub al, 60h
  00000052  66| 9C				pushf
- 00000054  80 CC 01				or ah, 00000001b
+ 00000054  80 CC 01				or ah, 00000001b ; 調整Carry = 1
  00000057  66| 9D				popf
- 00000059  9E					sahf
+ 00000059  9E					sahf ; 將AH的8bit送至Eflag
 					.ELSE
  0000005C  66| 9C				pushf
- 0000005E  80 CC 00				or ah, 00000000b
+ 0000005E  80 CC 00				or ah, 00000000b ; 調整Carry = 0
  00000061  66| 9D				popf
- 00000063  9E					sahf
+ 00000063  9E					sahf ; 將AH的8bit送至Eflag
 					.ENDIF
 
  00000064  C3			ret
@@ -88,7 +87,7 @@ C:/Irvine\SmallWin.inc(11) : warning A4011:multiple .MODEL directives found : .M
 
 
 
-Microsoft (R) Macro Assembler Version 14.16.27030.1	    12/22/19 12:33:33
+Microsoft (R) Macro Assembler Version 14.16.27030.1	    12/22/19 15:22:45
 AddTwo.asm						     Symbols 2 - 1
 
 
